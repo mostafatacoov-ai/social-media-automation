@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --accent: #6d28d9;
+  --accent-hover: color-mix(in srgb, var(--accent) 82%, black);
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, white);
+  --accent-ring: color-mix(in srgb, var(--accent) 35%, white);
+}
+
+@theme inline {
+  --font-sans: "Inter", "Segoe UI", "Tahoma", system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-100 text-slate-900 antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Utility classes used across the app */
+.btn-accent {
+  background: var(--accent);
+}
+.btn-accent:hover {
+  background: var(--accent-hover);
+}
+.text-accent {
+  color: var(--accent);
+}
+.bg-accent-soft {
+  background: var(--accent-soft);
+}
+.ring-accent:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}

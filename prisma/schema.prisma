@@ -1,0 +1,201 @@
+// Social Studio — Prisma schema (SQLite for dev, Postgres-ready: string enums, JSON as text)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Company {
+  id             String          @id @default(cuid())
+  name           String
+  industry       String          @default("")
+  description    String          @default("")
+  targetAudience String          @default("")
+  toneOfVoice    String          @default("professional")
+  language       String          @default("both") // ar | en | both
+  primaryColor   String          @default("#6d28d9")
+  secondaryColor String          @default("#0f172a")
+  logoPath       String          @default("") // media path, used on generated designs
+  website        String          @default("")
+  city           String          @default("")
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  campaigns      Campaign[]
+  posts          Post[]
+  accounts       SocialAccount[]
+  plans          MarketingPlan[]
+  reels          Reel[]
+  media          MediaAsset[]
+}
+
+model Campaign {
+  id             String         @id @default(cuid())
+  companyId      String
+  company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name           String
+  objective      String         @default("awareness") // awareness | engagement | leads | traffic | sales
+  description    String         @default("")
+  targetAudience String         @default("")
+  startDate      DateTime?
+  endDate        DateTime?
+  budget         String         @default("")
+  status         String         @default("active") // draft | active | completed
+  posts          Post[]
+  plans          MarketingPlan[]
+  reels          Reel[]
+  createdAt      DateTime       @default(now())
+}
+
+model SocialAccount {
+  id             String    @id @default(cuid())
+  companyId      String
+  company        Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  platform       String // meta_instagram | meta_facebook | linkedin | x | tiktok | snapchat
+  accountName    String
+  externalId     String    @default("") // page id / ig user id / member id / user id
+  accessToken    String    @default("") // encrypted at rest
+  refreshToken   String    @default("") // encrypted at rest
+  tokenExpiresAt DateTime?
+  meta           String    @default("{}") // JSON: extra ids, username, avatar...
+  status         String    @default("connected")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  posts          Post[]
+}
+
+model Post {
+  id             String        @id @default(cuid())
+  companyId      String
+  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  campaignId     String?
+  campaign       Campaign?     @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  planId         String?
+  platform       String // meta_instagram | meta_facebook | linkedin | x | tiktok | snapchat
+  contentType    String        @default("image") // text | image | carousel | reel | video
+  caption        String        @default("")
+  hashtags       String        @default("")
+  ctaUrl         String        @default("")
+  language       String        @default("en") // ar | en
+  status         String        @default("draft") // draft | scheduled | publishing | published | failed | needs_manual
+  scheduledAt    DateTime?
+  publishedAt    DateTime?
+  externalUrl    String?
+  externalId     String?
+  accountId      String?
+  account        SocialAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  error          String?
+  retryCount     Int           @default(0)
+  medias         PostMedia[]
+  logs           PublishLog[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model PostMedia {
+  id           String     @id @default(cuid())
+  postId       String
+  post         Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  mediaAssetId String
+  mediaAsset   MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+  order        Int        @default(0)
+}
+
+model MarketingPlan {
+  id            String    @id @default(cuid())
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  campaignId    String?
+  campaign      Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  title         String
+  durationWeeks Int       @default(4)
+  platforms     String    @default("[]") // JSON array
+  planData      String    @default("{}") // JSON — the full structured plan
+  language      String    @default("en")
+  status        String    @default("draft")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Reel {
+  id            String      @id @default(cuid())
+  companyId     String
+  company       Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  campaignId    String?
+  campaign      Campaign?   @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  title         String
+  template      String      @default("minimal") // minimal | showcase | stats | story | announcement
+  language      String      @default("en")
+  scriptData    String      @default("{}") // JSON: scenes, voiceover text, music...
+  voiceover     Boolean     @default(true)
+  voice         String      @default("en-US-AriaNeural")
+  musicAssetId  String?
+  subtitles     Boolean     @default(true)
+  status        String      @default("draft") // draft | rendering | ready | failed
+  videoAssetId  String? @unique
+  videoAsset    MediaAsset? @relation("ReelVideo", fields: [videoAssetId], references: [id], onDelete: SetNull)
+  sceneMedia    MediaAsset[] @relation("ReelScenes")
+  progress      Int         @default(0)
+  error         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  reelId    String?
+  reel      Reel?    @relation("ReelScenes", fields: [reelId], references: [id], onDelete: SetNull)
+  videoForReel Reel? @relation("ReelVideo")
+  kind      String // ai_image | template_image | reel_video | scene_image | audio | music | logo | upload
+  filePath  String // relative to MEDIA_DIR
+  mimeType  String   @default("image/png")
+  width     Int?
+  height    Int?
+  sizeBytes Int?
+  meta      String   @default("{}")
+  createdAt DateTime @default(now())
+  postMedias PostMedia[]
+}
+
+model RenderJob {
+  id           String   @id @default(cuid())
+  companyId    String?
+  type         String // reel_render | image_render
+  serviceJobId String?
+  status       String   @default("queued") // queued | processing | done | failed
+  progress     Int      @default(0)
+  payload      String   @default("{}")
+  result       String?
+  error        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Setting {
+  key   String @id
+  value String // JSON
+}
+
+model PublishLog {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  platform  String
+  status    String
+  message   String?
+  createdAt DateTime @default(now())
+}
