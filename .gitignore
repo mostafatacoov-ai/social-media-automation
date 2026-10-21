@@ -14,3 +14,4 @@ media-service/venv/
 .DS_Store
 tsconfig.tsbuildinfo
 next-env.d.ts
+*TEMP_MPY*

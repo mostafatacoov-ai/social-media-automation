@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getTextProvider } from "@/lib/ai";
-import { reelScriptPrompts, ReelScript } from "@/lib/ai/prompts";
+import { tracked } from "@/lib/agents/runner";
+import { generateReelScript } from "@/lib/agents/tasks";
 import { errorResponse, getActiveCompanyId, parseJsonBody, requireUser } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
@@ -48,31 +48,25 @@ export async function POST(req: NextRequest) {
       ? await prisma.campaign.findUnique({ where: { id: body.campaignId } })
       : null;
 
-    const provider = await getTextProvider();
-    const { system, user } = reelScriptPrompts({
-      company: {
-        name: company.name,
-        industry: company.industry,
-        description: company.description,
-        targetAudience: company.targetAudience,
-        toneOfVoice: company.toneOfVoice,
-        city: company.city,
-        website: company.website,
-      },
-      campaign: campaign
-        ? { name: campaign.name, objective: campaign.objective, description: campaign.description, targetAudience: campaign.targetAudience }
-        : undefined,
-      template: body.template || "minimal",
-      topic: body.topic,
-      language: body.language || "en",
-      sceneCount: Math.min(8, Math.max(3, body.sceneCount || 5)),
-      withVoiceover: body.voiceover !== false,
-    });
-
-    const script = await provider.generateJSON<ReelScript>(system, user, { maxTokens: 2500 });
-    if (!Array.isArray(script.scenes) || script.scenes.length === 0) {
-      return NextResponse.json({ error: "AI returned an invalid script — try again." }, { status: 502 });
-    }
+    const script = await tracked(
+      "director",
+      "Reel script from Reels page",
+      { companyId, input: { topic: body.topic, template: body.template } },
+      async (log) => {
+        log(`Scripting a ${body.template || "minimal"} reel…`);
+        const s = await generateReelScript({
+          company,
+          campaign,
+          topic: body.topic,
+          template: body.template || "minimal",
+          language: body.language || "en",
+          sceneCount: Math.min(8, Math.max(3, body.sceneCount || 5)),
+          withVoiceover: body.voiceover !== false,
+        });
+        log(`${s.scenes.length} scenes ready`);
+        return s;
+      }
+    );
 
     const reel = await prisma.reel.create({
       data: {

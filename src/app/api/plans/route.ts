@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getTextProvider } from "@/lib/ai";
-import { marketingPlanPrompts } from "@/lib/ai/prompts";
+import { tracked } from "@/lib/agents/runner";
+import { generatePlan } from "@/lib/agents/tasks";
 import { errorResponse, getActiveCompanyId, parseJsonBody, requireUser } from "@/lib/api-helpers";
 import { PLATFORMS } from "@/lib/constants";
 
@@ -49,40 +49,33 @@ export async function POST(req: NextRequest) {
     const selected = (body.platforms || ["meta_instagram", "meta_facebook", "linkedin", "x"]).filter(
       (p) => validPlatforms.includes(p)
     );
-    const platformLabels = selected.map((p) => PLATFORMS.find((x) => x.id === p)?.label || p);
     const weeks = Math.min(12, Math.max(1, body.weeks || 4));
 
-    const provider = await getTextProvider();
-    const { system, user } = marketingPlanPrompts({
-      company: {
-        name: company.name,
-        industry: company.industry,
-        description: company.description,
-        targetAudience: company.targetAudience,
-        toneOfVoice: company.toneOfVoice,
-        city: company.city,
-        website: company.website,
-      },
-      campaign: campaign
-        ? { name: campaign.name, objective: campaign.objective, description: campaign.description, targetAudience: campaign.targetAudience }
-        : undefined,
-      platforms: platformLabels,
-      weeks,
-      language: body.language || company.language || "en",
-      goals: body.goals,
-      budget: body.budget || campaign?.budget || undefined,
-    });
-
-    const planData = await provider.generateJSON<Record<string, unknown>>(system, user, {
-      maxTokens: 8000,
-      temperature: 0.6,
-    });
+    const { planData, title } = await tracked(
+      "strategist",
+      "Generate marketing plan",
+      { companyId, input: { campaign: campaign?.name, weeks, platforms: selected } },
+      async (log) => {
+        log("Reading the company profile and campaign brief…");
+        const result = await generatePlan({
+          company,
+          campaign,
+          platforms: selected,
+          weeks,
+          language: body.language || company.language || "en",
+          goals: body.goals,
+          budget: body.budget,
+        });
+        log("Structure ready: pillars, personas and calendar");
+        return result;
+      }
+    );
 
     const plan = await prisma.marketingPlan.create({
       data: {
         companyId,
         campaignId: campaign?.id || null,
-        title: body.title?.trim() || `${campaign?.name || company.name} — ${weeks}-week plan`,
+        title: body.title?.trim() || title,
         durationWeeks: weeks,
         platforms: JSON.stringify(selected),
         planData: JSON.stringify(planData),

@@ -1,13 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Building2, PenLine, Video, ClipboardList, CalendarClock, Plug, Sparkles, ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
+import { Building2, PenLine, Video, ClipboardList, CalendarClock, Plug, Sparkles, ArrowRight, Bot } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Misc";
 import { PlatformChip, StatusBadge } from "@/components/ui/Badge";
 import { api } from "@/lib/client";
 import { formatDate, timeAgo } from "@/lib/utils";
+
+function CountUp({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0);
+  const ref = useRef(0);
+  useEffect(() => {
+    const start = performance.now();
+    const from = ref.current;
+    const duration = 700;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(Math.round(from + (value - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else ref.current = value;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{display}</>;
+}
 
 interface Analytics {
   companies: number;
@@ -52,7 +74,12 @@ export function DashboardClient() {
       </div>
 
       {/* Stat cards */}
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4"
+      >
         {[
           { label: "Companies", value: data.companies, icon: Building2, href: "/companies" },
           { label: "Posts", value: totalPosts, icon: PenLine, href: "/posts", sub: `${statusCount("scheduled")} scheduled · ${statusCount("published")} published` },
@@ -61,23 +88,67 @@ export function DashboardClient() {
         ].map((s) => {
           const Icon = s.icon;
           return (
-            <Link key={s.label} href={s.href}>
-              <Card className="p-5 transition-shadow hover:shadow-md">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-2xl font-black text-slate-900">{s.value}</div>
-                    <div className="mt-0.5 text-xs font-semibold text-slate-500">{s.label}</div>
-                    {s.sub && <div className="mt-1 text-[11px] text-slate-400">{s.sub}</div>}
+            <motion.div
+              key={s.label}
+              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+              whileHover={{ y: -3 }}
+              transition={{ type: "spring", stiffness: 300, damping: 22 }}
+            >
+              <Link href={s.href}>
+                <Card className="p-5 transition-shadow hover:shadow-md">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-2xl font-black text-slate-900">
+                        <CountUp value={s.value} />
+                      </div>
+                      <div className="mt-0.5 text-xs font-semibold text-slate-500">{s.label}</div>
+                      {s.sub && <div className="mt-1 text-[11px] text-slate-400">{s.sub}</div>}
+                    </div>
+                    <motion.div
+                      whileHover={{ rotate: 8, scale: 1.1 }}
+                      className="rounded-xl bg-accent-soft p-2.5 text-[var(--accent)]"
+                    >
+                      <Icon size={18} />
+                    </motion.div>
                   </div>
-                  <div className="rounded-xl bg-accent-soft p-2.5 text-[var(--accent)]">
-                    <Icon size={18} />
-                  </div>
-                </div>
-              </Card>
-            </Link>
+                </Card>
+              </Link>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
+
+      {/* AI team banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="mb-6"
+      >
+        <Link href="/agents">
+          <Card className="group relative overflow-hidden p-5 transition-shadow hover:shadow-md">
+            <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-soft)] via-transparent to-transparent" />
+            <div className="relative flex flex-wrap items-center gap-4">
+              <motion.div
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)] text-2xl text-white"
+                animate={{ rotate: [0, 6, -6, 0] }}
+                transition={{ repeat: Infinity, duration: 4, repeatDelay: 1 }}
+              >
+                <Bot size={24} />
+              </motion.div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-bold text-slate-900">Your AI marketing team is ready</h3>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  7 agents — strategist, copywriter, designer, director, scheduler, publisher, analyst — run your content on Autopilot.
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent)] group-hover:gap-2 transition-all">
+                Meet the agents <ArrowRight size={13} />
+              </span>
+            </div>
+          </Card>
+        </Link>
+      </motion.div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {/* Upcoming */}

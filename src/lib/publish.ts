@@ -94,15 +94,30 @@ export async function publishPost(postId: string): Promise<{ status: string; mes
 }
 
 // Used by the in-process cron and the external cron endpoint.
+// Each batch is recorded as a Publisher agent run.
 export async function publishDuePosts(): Promise<number> {
   const due = await prisma.post.findMany({
     where: { status: "scheduled", scheduledAt: { lte: new Date() } },
-    select: { id: true },
+    select: { id: true, platform: true },
+  });
+  if (due.length === 0) return 0;
+
+  const { startRun, logStep, finishRun } = await import("@/lib/agents/runner");
+  const runId = await startRun({
+    agentKey: "publisher",
+    action: "Publish due posts",
+    input: { count: due.length },
   });
   let count = 0;
+  let failures = 0;
   for (const p of due) {
-    await publishPost(p.id);
-    count++;
+    const result = await publishPost(p.id);
+    if (result.status === "published") count++;
+    else if (result.status === "failed") failures++;
+    logStep(runId, `${p.platform}: ${result.status}${result.message ? ` — ${result.message.slice(0, 80)}` : ""}`);
   }
+  await finishRun(runId, failures > 0 && count === 0 ? "failed" : "done", {
+    summary: `Published ${count}/${due.length}${failures ? ` · ${failures} failed` : ""}`,
+  });
   return count;
 }

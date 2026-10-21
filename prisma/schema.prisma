@@ -190,6 +190,35 @@ model Setting {
   value String // JSON
 }
 
+// ===== AI agent system =====
+
+model AgentRun {
+  id          String    @id @default(cuid())
+  agentKey    String // strategist | copywriter | designer | director | scheduler | publisher | analyst
+  companyId   String?
+  autopilotId String?
+  action      String    @default("")
+  status      String    @default("running") // running | done | failed
+  input       String    @default("{}")
+  output      String?
+  steps       String    @default("[]") // JSON: [{t, msg}]
+  error       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Autopilot {
+  id          String   @id @default(cuid())
+  companyId   String
+  campaignId  String?
+  status      String   @default("running") // running | done | failed
+  config      String   @default("{}") // platforms, weeks, includeReel, language
+  steps       String   @default("[]") // JSON: [{key, label, status, note}]
+  currentStep Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model PublishLog {
   id        String   @id @default(cuid())
   postId    String

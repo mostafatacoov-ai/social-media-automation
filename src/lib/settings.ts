@@ -122,14 +122,19 @@ export async function getAiSettingsMasked() {
 export async function saveAiSettings(update: Partial<AiSettings>) {
   const current = await getAiSettings();
   const next: AiSettings = { ...current, ...update };
-  // Merge provider configs; encrypt any new plaintext keys
+  // Merge provider configs; encrypt any new plaintext keys.
+  // Masked values ("••••…", sent back untouched by the settings form) keep the saved key.
   next.providers = Object.fromEntries(
     Object.entries({ ...current.providers, ...(update.providers || {}) }).map(
       ([id, cfg]) => {
-        const isNewKey = update.providers?.[id]?.apiKey;
+        const newKey = update.providers?.[id]?.apiKey;
+        const useNew =
+          newKey && newKey.trim() && !newKey.startsWith("•")
+            ? newKey.trim()
+            : null;
         return [
           id,
-          { ...cfg, apiKey: isNewKey ? encrypt(isNewKey) : current.providers[id]?.apiKey || "" },
+          { ...cfg, apiKey: useNew ? encrypt(useNew) : current.providers[id]?.apiKey || "" },
         ];
       }
     )

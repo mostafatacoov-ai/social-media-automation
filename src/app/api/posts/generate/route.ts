@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getTextProvider } from "@/lib/ai";
-import { captionPrompts, CaptionVariant } from "@/lib/ai/prompts";
+import { tracked } from "@/lib/agents/runner";
+import { generateCaptions } from "@/lib/agents/tasks";
 import { errorResponse, getActiveCompanyId, parseJsonBody, requireUser } from "@/lib/api-helpers";
 
-// AI caption generation.
+// AI caption generation (Copywriter agent).
 export async function POST(req: NextRequest) {
   try {
     await requireUser();
@@ -27,40 +27,28 @@ export async function POST(req: NextRequest) {
       ? await prisma.campaign.findUnique({ where: { id: body.campaignId } })
       : null;
 
-    const provider = await getTextProvider();
-    const { system, user } = captionPrompts({
-      company: {
-        name: company.name,
-        industry: company.industry,
-        description: company.description,
-        targetAudience: company.targetAudience,
-        toneOfVoice: company.toneOfVoice,
-        city: company.city,
-        website: company.website,
-      },
-      campaign: campaign
-        ? {
-            name: campaign.name,
-            objective: campaign.objective,
-            description: campaign.description,
-            targetAudience: campaign.targetAudience,
-          }
-        : undefined,
-      platform: body.platform,
-      contentType: body.contentType || "image",
-      topic: body.topic || "",
-      language: body.language || company.language || "en",
-      count: Math.min(5, Math.max(1, body.count || 3)),
-      extraContext: body.extraContext,
-    });
+    const variants = await tracked(
+      "copywriter",
+      "Captions for post composer",
+      { companyId, input: { topic: body.topic, platform: body.platform, language: body.language } },
+      async (log) => {
+        log(`Writing ${Math.min(5, Math.max(1, body.count || 3))} options for ${body.platform}…`);
+        const v = await generateCaptions({
+          company,
+          campaign,
+          platform: body.platform,
+          contentType: body.contentType,
+          topic: body.topic || "",
+          language: body.language || company.language || "en",
+          count: body.count,
+          extraContext: body.extraContext,
+        });
+        log(`${v.length} caption options ready`);
+        return v;
+      }
+    );
 
-    const result = await provider.generateJSON<{ variants: CaptionVariant[] }>(system, user, {
-      maxTokens: 4000,
-    });
-    if (!Array.isArray(result.variants)) {
-      return NextResponse.json({ error: "AI returned no variants — try again." }, { status: 502 });
-    }
-    return NextResponse.json({ variants: result.variants });
+    return NextResponse.json({ variants });
   } catch (e) {
     return errorResponse(e);
   }

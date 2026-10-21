@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion } from "motion/react";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -16,6 +17,7 @@ import {
   Settings,
   LogOut,
   CircleDot,
+  Bot,
 } from "lucide-react";
 import { BrandingSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
@@ -23,6 +25,7 @@ import { api } from "@/lib/client";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/agents", label: "AI Agents", icon: Bot },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/posts", label: "Posts", icon: PenLine },
   { href: "/reels", label: "Reels", icon: Video },
@@ -116,14 +119,37 @@ export function AppShell({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "bg-white/10 text-white"
+                    ? "text-white"
                     : "text-slate-400 hover:bg-white/5 hover:text-white"
                 )}
               >
-                <Icon size={17} />
-                {item.label}
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 rounded-lg bg-white/10"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                <motion.span
+                  className="relative"
+                  whileHover={{ scale: 1.15, rotate: item.label === "AI Agents" ? 8 : 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
+                  <Icon size={17} />
+                </motion.span>
+                <span className="relative">{item.label}</span>
+                {item.href === "/agents" && (
+                  <motion.span
+                    className="relative ml-auto flex h-2 w-2"
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                  >
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                  </motion.span>
+                )}
               </Link>
             );
           })}
