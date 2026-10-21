@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Cairo } from "next/font/google";
+import { Inter, Cairo, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/Toaster";
 
@@ -15,6 +15,13 @@ const cairo = Cairo({
   display: "swap",
 });
 
+const techMono = Share_Tech_Mono({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-tech-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Social Studio",
   description: "White-label AI social media marketing platform",
@@ -26,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cairo.variable}`}>
+    <html lang="en" className={`${inter.variable} ${cairo.variable} ${techMono.variable}`}>
       <body className="font-sans min-h-screen">
         {children}
         <Toaster />

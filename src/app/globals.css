@@ -107,3 +107,80 @@ body {
 @media print {
   aside, header, .no-print { display: none !important; }
 }
+
+/* ===== HUD (AI Agents operations console) ===== */
+.hud-spin { animation: hud-spin 9s linear infinite; }
+.hud-spin-r { animation: hud-spin-r 40s linear infinite; }
+.hud-spin-fast { animation: hud-spin 6s linear infinite; }
+@keyframes hud-spin { to { transform: rotate(360deg); } }
+@keyframes hud-spin-r { to { transform: rotate(-360deg); } }
+
+.hud-blink { animation: hud-blink 1.2s ease-in-out infinite; }
+@keyframes hud-blink { 0%, 100% { opacity: 0.15; } 50% { opacity: 1; } }
+
+.hud-flick { animation: hud-flick 3s linear infinite; }
+@keyframes hud-flick { 0%, 100% { opacity: 1; } 48% { opacity: 1; } 50% { opacity: 0.55; } 52% { opacity: 1; } }
+
+.hud-dash { animation: hud-dash 1.1s linear infinite; }
+@keyframes hud-dash { to { stroke-dashoffset: -64; } }
+
+.hud-dash-slow { animation: hud-dash 2.6s linear infinite reverse; }
+
+.hud-sweep {
+  animation: hud-sweep 5s linear infinite;
+  pointer-events: none;
+}
+@keyframes hud-sweep {
+  0% { transform: translateY(-140px); }
+  100% { transform: translateY(1100px); }
+}
+
+.hud-hop { animation: hud-hop 1.6s ease-in-out infinite; }
+@keyframes hud-hop {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* Working (teal/agent-color glow) and thinking (amber) states */
+.hud-glow { animation: hud-glow 1.4s ease-in-out infinite; }
+@keyframes hud-glow {
+  0%, 100% { box-shadow: 0 0 0 1px var(--agent-color, #13b6a6), 0 0 18px color-mix(in srgb, var(--agent-color, #13b6a6) 35%, transparent); }
+  50% { box-shadow: 0 0 0 1px var(--agent-color, #13b6a6), 0 0 38px color-mix(in srgb, var(--agent-color, #13b6a6) 75%, transparent); }
+}
+.hud-think { animation: hud-think 1.2s ease-in-out infinite; }
+@keyframes hud-think {
+  0%, 100% { box-shadow: 0 0 0 1px #e0a93b, 0 0 14px rgba(224, 169, 59, 0.3); }
+  50% { box-shadow: 0 0 0 1px #e0a93b, 0 0 30px rgba(224, 169, 59, 0.65); }
+}
+
+.hud-tape { animation: hud-marquee 38s linear infinite; }
+@keyframes hud-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.hud-grid {
+  background-image:
+    linear-gradient(rgba(19, 182, 166, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19, 182, 166, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.hud-mono {
+  font-family: var(--font-tech-mono), ui-monospace, monospace;
+  letter-spacing: 1px;
+}
+
+.hud-input {
+  background: #071b26 !important;
+  border-color: #17475a !important;
+  color: #e6f2f5 !important;
+}
+.hud-input::placeholder { color: #52707d !important; }
+.hud-input:focus { box-shadow: 0 0 0 3px rgba(46, 230, 214, 0.25) !important; }
+.hud-input option { background: #0a2532; color: #e6f2f5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-spin, .hud-spin-r, .hud-spin-fast, .hud-blink, .hud-flick, .hud-sweep,
+  .hud-hop, .hud-glow, .hud-think, .hud-tape, .hud-dash, .hud-dash-slow { animation: none !important; }
+}
