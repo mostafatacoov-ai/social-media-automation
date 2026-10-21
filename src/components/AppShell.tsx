@@ -122,8 +122,8 @@ export function AppShell({
           ) : (
             <motion.div
               whileHover={{ rotate: -6, scale: 1.06 }}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-sm font-black text-white shadow-lg"
-              style={{ boxShadow: "0 4px 14px -4px var(--accent)" }}
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-sm font-black text-[#171207] shadow-lg"
+              style={{ boxShadow: "0 4px 18px -4px var(--accent)" }}
             >
               {branding.appName.charAt(0)}
             </motion.div>
@@ -151,12 +151,13 @@ export function AppShell({
                 {active && (
                   <motion.span
                     layoutId="nav-active"
-                    className="absolute inset-0 rounded-lg bg-white/10"
+                    className="absolute inset-0 rounded-lg bg-accent-soft shadow-[inset_0_0_0_1px_var(--accent-ring),0_0_18px_-6px_var(--accent)]"
                     transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}
                 <motion.span
-                  className="relative"
+                  className="relative transition-colors"
+                  style={active ? { color: "var(--accent)" } : undefined}
                   whileHover={{ scale: 1.15, rotate: item.label === "AI Agents" ? 8 : 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 >
@@ -169,8 +170,8 @@ export function AppShell({
                     animate={{ opacity: [1, 0.3, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                   >
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#2dd4bf] opacity-60" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2dd4bf]" />
                   </motion.span>
                 )}
                 {item.href === "/whatsapp" && waUnread > 0 && (
@@ -193,9 +194,9 @@ export function AppShell({
           <div className="flex items-center gap-1.5">
             <CircleDot
               size={12}
-              className={mediaOnline === null ? "text-slate-500" : mediaOnline ? "text-emerald-400" : "text-rose-400"}
+              className={mediaOnline === null ? "text-slate-500" : mediaOnline ? "text-[#2dd4bf]" : "text-rose-400"}
             />
-            <span className={mediaOnline ? "text-slate-400" : "text-rose-300"}>
+            <span className={mediaOnline ? "text-slate-500" : "text-rose-300"}>
               {mediaOnline === null ? "Checking media service…" : mediaOnline ? "Media service online" : "Media service offline — run: npm run media"}
             </span>
           </div>
@@ -237,7 +238,7 @@ export function AppShell({
             </div>
             <motion.div
               whileHover={{ scale: 1.08 }}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-xs font-bold text-white shadow-sm"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-xs font-bold text-[#171207] shadow-sm"
               title={user.name}
             >
               {user.name.charAt(0).toUpperCase()}

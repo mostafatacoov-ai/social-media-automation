@@ -41,7 +41,7 @@ export function LoginForm({ branding }: { branding: BrandingSettings }) {
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-              className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-xl font-black text-white shadow-lg"
+              className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-xl font-black text-[#171207] shadow-lg"
               style={{ boxShadow: "0 8px 24px -8px var(--accent)" }}
             >
               {branding.appName.charAt(0)}

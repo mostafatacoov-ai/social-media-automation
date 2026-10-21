@@ -95,22 +95,20 @@ export function DashboardClient() {
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
             >
               <Link href={s.href}>
-                <Card className="p-5 transition-shadow hover:shadow-md">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-2xl font-black text-slate-900">
-                        <CountUp value={s.value} />
-                      </div>
-                      <div className="mt-0.5 text-xs font-semibold text-slate-500">{s.label}</div>
-                      {s.sub && <div className="mt-1 text-[11px] text-slate-400">{s.sub}</div>}
-                    </div>
+                <Card className="group relative overflow-hidden p-5 transition-all hover:shadow-[0_0_0_1px_var(--accent-ring),0_10px_36px_-14px_var(--accent)]">
+                  <div className="flex items-start justify-between">
                     <motion.div
                       whileHover={{ rotate: 8, scale: 1.1 }}
-                      className="rounded-xl bg-accent-soft p-2.5 text-[var(--accent)]"
+                      className="rounded-xl bg-accent-soft p-2.5 text-[var(--gold-bright)] shadow-[inset_0_0_0_1px_var(--hairline-soft)]"
                     >
                       <Icon size={18} />
                     </motion.div>
                   </div>
+                  <div className="kpi-digit mt-4 text-[42px] leading-none text-slate-900">
+                    <CountUp value={s.value} />
+                  </div>
+                  <div className="micro-label mt-2">{s.label}</div>
+                  {s.sub && <div className="mt-1 text-[11px] text-slate-400">{s.sub}</div>}
                 </Card>
               </Link>
             </motion.div>
@@ -130,7 +128,7 @@ export function DashboardClient() {
             <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-soft)] via-transparent to-transparent" />
             <div className="relative flex flex-wrap items-center gap-4">
               <motion.div
-                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)] text-2xl text-white"
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)] text-2xl text-[#171207]"
                 animate={{ rotate: [0, 6, -6, 0] }}
                 transition={{ repeat: Infinity, duration: 4, repeatDelay: 1 }}
               >
@@ -189,7 +187,9 @@ export function DashboardClient() {
                 <Link key={c.label} href={c.href} className="flex items-center gap-3 rounded-lg border border-slate-200 p-2.5 text-xs hover:border-[var(--accent)]">
                   <span
                     className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                      c.done ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"
+                      c.done
+                        ? "bg-emerald-100 text-emerald-600"
+                        : "border border-white/15 bg-transparent text-slate-500"
                     }`}
                   >
                     {c.done ? "✓" : ""}

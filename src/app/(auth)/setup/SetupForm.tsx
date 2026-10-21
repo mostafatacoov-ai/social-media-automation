@@ -45,7 +45,7 @@ export function SetupForm({ branding }: { branding: BrandingSettings }) {
           <motion.div
             animate={{ y: [0, -6, 0] }}
             transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-            className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-lg"
+            className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-[#171207] shadow-lg"
             style={{ boxShadow: "0 8px 24px -8px var(--accent)" }}
           >
             <Rocket size={22} />

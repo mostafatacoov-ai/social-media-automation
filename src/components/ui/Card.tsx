@@ -13,8 +13,8 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border border-slate-200/90 bg-white shadow-sm transition-all duration-200",
-        hover && "hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md",
+        "rounded-2xl border border-white/[0.07] bg-[var(--surface)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04),0_10px_30px_-18px_rgba(0,0,0,0.65)] transition-all duration-200",
+        hover && "hover:-translate-y-0.5 hover:border-white/[0.16] hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_16px_40px_-18px_rgba(0,0,0,0.75)]",
         className
       )}
     >

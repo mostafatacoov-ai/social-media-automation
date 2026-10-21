@@ -14,7 +14,7 @@ export interface BrandingSettings {
 export const DEFAULT_BRANDING: BrandingSettings = {
   appName: "Social Studio",
   tagline: "AI social media marketing platform",
-  accent: "#6d28d9",
+  accent: "#d4a94f",
   logoUrl: "",
 };
 

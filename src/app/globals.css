@@ -1,10 +1,31 @@
 @import "tailwindcss";
 
+/* =====================================================================
+   Design system — "Control" dark theme (deep teal + gold)
+   Inspired by: AI Dashboard Design for Control AI Policy Platform
+   Surfaces: #0a1414 page · #122525 cards · hairline white borders
+   Accent:   gold #d4a94f → #e8c877 · secondary teal #2dd4bf
+   ===================================================================== */
 :root {
-  --accent: #6d28d9;
-  --accent-hover: color-mix(in srgb, var(--accent) 82%, black);
-  --accent-soft: color-mix(in srgb, var(--accent) 10%, white);
-  --accent-ring: color-mix(in srgb, var(--accent) 35%, white);
+  --accent: #d4a94f;
+  --accent-hover: #e8c877;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, #0d1a1a);
+  --accent-ring: color-mix(in srgb, var(--accent) 32%, transparent);
+
+  --bg: #0a1414;
+  --bg-raised: #0f1f1f;
+  --surface: #122525;
+  --surface-2: #16302f;
+  --surface-3: #1a3d38;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-soft: rgba(255, 255, 255, 0.06);
+  --ink: #edf7f5;
+  --ink-2: #c3d8d4;
+  --ink-muted: #8aa5a2;
+  --ink-faint: #6d8a87;
+  --teal: #2dd4bf;
+  --gold: #d4a94f;
+  --gold-bright: #e8c877;
 }
 
 @theme inline {
@@ -17,8 +38,13 @@ body {
 }
 
 body {
-  @apply bg-slate-100 text-slate-900 antialiased;
+  background:
+    radial-gradient(1100px 520px at 85% -10%, rgba(45, 212, 191, 0.06), transparent 60%),
+    radial-gradient(900px 520px at -10% 110%, rgba(212, 169, 79, 0.05), transparent 60%),
+    var(--bg);
+  color: var(--ink);
   font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
 }
 
 ::-webkit-scrollbar {
@@ -26,31 +52,130 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
+  background: #2a4643;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
+  background: #3a5a56;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 
 ::selection {
-  background: var(--accent-ring);
+  background: color-mix(in srgb, var(--gold) 35%, transparent);
+  color: #fff8e7;
 }
 
-/* ===== Brand utilities ===== */
-.btn-accent {
-  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #1e1b4b));
+/* =====================================================================
+   THEME RE-MAPPING LAYER
+   The app was authored with light slate utilities; these rules re-map
+   them to the dark teal system so every page re-themes at once.
+   ===================================================================== */
+
+/* ---- Surfaces ---- */
+.bg-white { background-color: var(--surface) !important; }
+.bg-white\/95 { background-color: rgba(18, 37, 37, 0.95) !important; }
+.bg-white\/90 { background-color: rgba(18, 37, 37, 0.9) !important; }
+.bg-white\/60 { background-color: rgba(18, 37, 37, 0.6) !important; }
+
+.bg-slate-50 { background-color: var(--bg-raised) !important; }
+.bg-slate-50\/60 { background-color: rgba(15, 31, 31, 0.6) !important; }
+.bg-slate-50\/50 { background-color: rgba(15, 31, 31, 0.5) !important; }
+.bg-slate-100 { background-color: var(--surface-2) !important; }
+.bg-slate-200 { background-color: #23403d !important; }
+.bg-slate-200\/60 { background-color: #0e2020 !important; }
+.bg-slate-300 { background-color: #2a4643 !important; }
+.bg-slate-300\/50 { background-color: rgba(42, 70, 67, 0.5) !important; }
+.bg-slate-400 { background-color: #3a5a56 !important; }
+.bg-slate-800 { background-color: var(--surface-3) !important; }
+.bg-slate-800\/95 { background-color: rgba(26, 61, 56, 0.95) !important; }
+.bg-slate-900 { background-color: #0d1a1a !important; }
+.bg-slate-900\/50 { background-color: rgba(4, 10, 10, 0.65) !important; }
+.bg-slate-950 { background-color: #081010 !important; }
+
+/* ---- Text ---- */
+.text-slate-900 { color: var(--ink) !important; }
+.text-slate-800 { color: #dcebe8 !important; }
+.text-slate-700 { color: var(--ink-2) !important; }
+.text-slate-600 { color: #a8c2be !important; }
+.text-slate-500 { color: var(--ink-muted) !important; }
+.text-slate-400 { color: var(--ink-faint) !important; }
+.text-slate-300 { color: #52707d !important; }
+
+.text-emerald-700 { color: #5eead4 !important; }
+.text-emerald-600 { color: #2dd4bf !important; }
+.text-emerald-500 { color: #34d399 !important; }
+.text-emerald-400 { color: #6ee7b7 !important; }
+.text-rose-700 { color: #fda4af !important; }
+.text-rose-600 { color: #fb7185 !important; }
+.text-rose-500 { color: #f87171 !important; }
+.text-rose-400 { color: #fca5a5 !important; }
+.text-rose-300 { color: #fecdd3 !important; }
+.text-amber-700 { color: #fcd34d !important; }
+.text-amber-600 { color: #fbbf24 !important; }
+.text-amber-500 { color: #fbbf24 !important; }
+.text-sky-700 { color: #7dd3fc !important; }
+.text-sky-600 { color: #38bdf8 !important; }
+.text-violet-700 { color: #c4b5fd !important; }
+
+/* ---- Borders / dividers ---- */
+.border-slate-300 { border-color: #2a4a46 !important; }
+.border-slate-200 { border-color: var(--hairline) !important; }
+.border-slate-200\/90 { border-color: var(--hairline) !important; }
+.border-slate-100 { border-color: var(--hairline-soft) !important; }
+.divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--hairline-soft) !important;
 }
-.btn-accent:hover {
-  background: linear-gradient(135deg, var(--accent-hover), color-mix(in srgb, var(--accent) 60%, #1e1b4b));
-}
-/* Light sheen sweep on hover */
+
+/* ---- Soft tinted chips / banners ---- */
+.bg-emerald-50 { background-color: rgba(45, 212, 191, 0.08) !important; }
+.bg-emerald-100 { background-color: rgba(45, 212, 191, 0.13) !important; }
+.bg-rose-50 { background-color: rgba(244, 63, 94, 0.09) !important; }
+.bg-rose-100 { background-color: rgba(244, 63, 94, 0.14) !important; }
+.bg-amber-50 { background-color: rgba(232, 200, 119, 0.09) !important; }
+.bg-amber-100 { background-color: rgba(232, 200, 119, 0.14) !important; }
+.bg-sky-50 { background-color: rgba(56, 189, 248, 0.08) !important; }
+.bg-sky-100 { background-color: rgba(56, 189, 248, 0.13) !important; }
+.bg-violet-100 { background-color: rgba(167, 139, 250, 0.14) !important; }
+.bg-rose-500\/20 { background-color: rgba(244, 63, 94, 0.2) !important; }
+
+/* ---- Hovers ---- */
+.hover\:bg-slate-100:hover { background-color: #1a3534 !important; }
+.hover\:bg-slate-200:hover { background-color: #1a3534 !important; }
+.hover\:bg-slate-50:hover { background-color: #152a29 !important; }
+.hover\:bg-slate-700:hover { background-color: #234a44 !important; }
+.hover\:bg-rose-50:hover { background-color: rgba(244, 63, 94, 0.13) !important; }
+.hover\:bg-emerald-50:hover { background-color: rgba(45, 212, 191, 0.12) !important; }
+.hover\:border-slate-300:hover { border-color: #35605a !important; }
+.hover\:text-slate-900:hover { color: var(--ink) !important; }
+.hover\:text-slate-800:hover { color: #dcebe8 !important; }
+.hover\:text-slate-700:hover { color: var(--ink-2) !important; }
+.hover\:text-slate-600:hover { color: #a8c2be !important; }
+.hover\:text-rose-600:hover { color: #fb7185 !important; }
+.hover\:text-rose-700:hover { color: #fda4af !important; }
+.hover\:text-emerald-600:hover { color: #2dd4bf !important; }
+
+/* ---- Inputs ---- */
+input, select, textarea { color-scheme: dark; }
+.placeholder\:text-slate-400::placeholder { color: #52707d !important; }
+input::placeholder, textarea::placeholder { color: #52707d; }
+
+/* =====================================================================
+   Brand utilities
+   ===================================================================== */
 .btn-accent {
   position: relative;
   overflow: hidden;
+  color: #0d1a16;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold) 55%, #b8922f);
+  box-shadow: 0 0 0 1px rgba(232, 200, 119, 0.35), 0 6px 22px -8px rgba(212, 169, 79, 0.55);
 }
+.btn-accent:hover {
+  background: linear-gradient(135deg, #f2d98e, var(--gold-bright) 55%, var(--gold));
+  box-shadow: 0 0 0 1px rgba(232, 200, 119, 0.55), 0 8px 30px -8px rgba(212, 169, 79, 0.75);
+}
+/* Light sheen sweep on hover */
 .btn-accent::after {
   content: "";
   position: absolute;
@@ -58,7 +183,7 @@ body {
   left: -160%;
   width: 55%;
   height: 100%;
-  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.45), transparent);
   transform: skewX(-20deg);
   transition: left 0.55s ease;
   pointer-events: none;
@@ -68,7 +193,7 @@ body {
 }
 
 .text-accent {
-  color: var(--accent);
+  color: var(--gold-bright);
 }
 .bg-accent-soft {
   background: var(--accent-soft);
@@ -81,12 +206,27 @@ body {
   transform: scaleX(-1);
 }
 
-/* Gradient headline used on auth pages */
+/* Gradient headline used on auth pages — gold → teal */
 .text-gradient {
-  background: linear-gradient(120deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #0ea5e9));
+  background: linear-gradient(120deg, #f2d98e, var(--gold) 45%, var(--teal));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* KPI digit style from the reference design — huge, light, tight */
+.kpi-digit {
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Micro uppercase label */
+.micro-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
 }
 
 /* Animated gradient blobs on auth pages */
@@ -99,7 +239,7 @@ body {
   position: absolute;
   border-radius: 9999px;
   filter: blur(80px);
-  opacity: 0.5;
+  opacity: 0.35;
   animation: blobFloat 14s ease-in-out infinite;
   will-change: transform;
 }

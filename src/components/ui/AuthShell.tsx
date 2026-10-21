@@ -14,11 +14,11 @@ export function AuthShell({ children }: { children: ReactNode }) {
       />
       <div
         className="blob"
-        style={{ background: "#0ea5e9", width: 360, height: 360, bottom: "-10%", right: "-5%", animationDelay: "-5s" }}
+        style={{ background: "#2dd4bf", width: 360, height: 360, bottom: "-10%", right: "-5%", animationDelay: "-5s" }}
       />
       <div
         className="blob"
-        style={{ background: "#ec4899", width: 280, height: 280, top: "55%", left: "18%", opacity: 0.3, animationDelay: "-9s" }}
+        style={{ background: "#d4a94f", width: 280, height: 280, top: "55%", left: "18%", opacity: 0.25, animationDelay: "-9s" }}
       />
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
