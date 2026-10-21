@@ -39,6 +39,8 @@ model Company {
   plans          MarketingPlan[]
   reels          Reel[]
   media          MediaAsset[]
+  waContacts     WhatsAppContact[]
+  waMessages     WhatsAppMessage[]
 }
 
 model Campaign {
@@ -217,6 +219,41 @@ model Autopilot {
   currentStep Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// ===== WhatsApp inbox (Cloud API) =====
+
+model WhatsAppContact {
+  id            String    @id @default(cuid())
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  waId          String // phone number in WhatsApp format, e.g. 9665xxxxxxxx
+  name          String    @default("")
+  lastMessageAt DateTime  @default(now())
+  lastInboundAt DateTime? // opens the 24h customer-service window
+  unreadCount   Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  messages      WhatsAppMessage[]
+
+  @@unique([companyId, waId])
+}
+
+model WhatsAppMessage {
+  id         String          @id @default(cuid())
+  companyId  String
+  company    Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contactId  String
+  contact    WhatsAppContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  direction  String // in | out
+  kind       String          @default("text") // text | image | template
+  body       String          @default("")
+  mediaUrl   String?
+  template   String?
+  status     String          @default("sent") // received | sent | delivered | read | failed
+  externalId String?
+  error      String?
+  createdAt  DateTime        @default(now())
 }
 
 model PublishLog {

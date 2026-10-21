@@ -67,6 +67,18 @@ All credentials go in **Settings → Connections** (add the redirect URI shown t
 | **TikTok** | Content Posting API access (requires app review for public posts; unaudited apps post as private on the connected account). |
 | **Snapchat** | **No public posting API** — posts are marked “manual”: content is generated at 1080×1920 and downloadable for hand-posting. |
 
+### WhatsApp inbox & AI concierge
+
+Uses the official **WhatsApp Cloud API** (free tier: unlimited messages inside 24-hour customer windows + 1,000 service conversations/month).
+
+1. In [Meta Developers](https://developers.facebook.com/apps) create an app with the **WhatsApp** product.
+2. On the app's **WhatsApp page**, copy the **Phone number ID**.
+3. In Meta Business Settings → System Users, generate a **permanent access token** with `whatsapp_business_messaging` permission.
+4. Paste them into the setup card on the app's **WhatsApp** page → **Test connection**.
+5. To **receive** replies, in Meta → WhatsApp → Configuration set the webhook URL shown on the WhatsApp page (includes your company id) plus the verify token. Webhooks need a public URL — when running locally use a tunnel (e.g. ngrok) and set `PUBLIC_BASE_URL`. **Sending works without a webhook.**
+
+Features: two-pane inbox, send text/images from the media library, approved template sending outside the 24-hour window, unread badges, and an **AI auto-reply toggle** — the WhatsApp Concierge agent (Ziad) instantly answers incoming messages in the customer's language using the company's brand voice.
+
 ## Environment variables (`.env`)
 
 | Variable | Purpose |

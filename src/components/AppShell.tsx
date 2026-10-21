@@ -18,6 +18,7 @@ import {
   LogOut,
   CircleDot,
   Bot,
+  MessageCircle,
 } from "lucide-react";
 import { BrandingSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ import { api } from "@/lib/client";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/agents", label: "AI Agents", icon: Bot },
+  { href: "/whatsapp", label: "WhatsApp", icon: MessageCircle },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/posts", label: "Posts", icon: PenLine },
   { href: "/reels", label: "Reels", icon: Video },
@@ -59,6 +61,7 @@ export function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const [mediaOnline, setMediaOnline] = useState<boolean | null>(null);
+  const [waUnread, setWaUnread] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -78,6 +81,22 @@ export function AppShell({
       clearInterval(t);
     };
   }, []);
+
+  // WhatsApp unread badge
+  useEffect(() => {
+    let alive = true;
+    const check = () =>
+      fetch("/api/whatsapp/unread")
+        .then((r) => (r.ok ? r.json() : { unread: 0 }))
+        .then((b) => alive && setWaUnread(b.unread || 0))
+        .catch(() => {});
+    check();
+    const t = setInterval(check, 20000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
+  }, [pathname]);
 
   async function switchCompany(id: string) {
     await api("/api/companies/active", { method: "POST", json: { id } });
@@ -152,6 +171,17 @@ export function AppShell({
                   >
                     <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                  </motion.span>
+                )}
+                {item.href === "/whatsapp" && waUnread > 0 && (
+                  <motion.span
+                    key={waUnread}
+                    initial={{ scale: 0.5 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                    className="relative ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[9px] font-bold text-white"
+                  >
+                    {waUnread > 9 ? "9+" : waUnread}
                   </motion.span>
                 )}
               </Link>

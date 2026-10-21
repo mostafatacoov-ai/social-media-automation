@@ -96,6 +96,17 @@ export const AGENTS: AgentDef[] = [
     manualTask: "analyst",
     worksVia: "Autopilot step 7 · Quick task",
   },
+  {
+    key: "concierge",
+    name: "Ziad",
+    emoji: "📱",
+    color: "#25d366",
+    title: "WhatsApp Concierge Agent",
+    description:
+      "Answers WhatsApp messages instantly: replies to customers in their own language using the company's brand voice, any hour of the day (enable per company in the WhatsApp inbox).",
+    capabilities: ["Instant replies", "AR/EN", "Brand voice", "24/7"],
+    worksVia: "WhatsApp inbox auto-reply · WhatsApp page",
+  },
 ];
 
 export const AGENT_MAP: Record<string, AgentDef> = Object.fromEntries(

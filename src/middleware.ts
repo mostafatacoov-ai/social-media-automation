@@ -9,11 +9,15 @@ const PUBLIC_PATHS = [
   "/api/cron", // external scheduler endpoint
 ];
 
+// Exact public paths (not prefixes)
+const PUBLIC_EXACT = ["/api/whatsapp/webhook"]; // Meta webhook verification + delivery
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (
     PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+    PUBLIC_EXACT.includes(pathname) ||
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico"
   ) {

@@ -152,6 +152,39 @@ export async function generateReelScript(opts: {
   return script;
 }
 
+// WhatsApp concierge reply — conversational, customer's language, brand voice.
+export async function generateWhatsAppReply(opts: {
+  company: { name: string; industry: string; description: string; toneOfVoice: string; website: string; city: string };
+  history: { direction: string; body: string }[];
+  incoming: string;
+}): Promise<string> {
+  const provider = await getTextProvider();
+  const system = `You are the WhatsApp customer-service concierge for "${opts.company.name}"${
+    opts.company.industry ? ` (${opts.company.industry})` : ""
+  }. Reply helpfully, warmly and concisely (under 80 words) — this is a chat, not an email.
+${opts.company.description ? `About the business: ${opts.company.description}` : ""}
+Rules:
+- Answer in the SAME LANGUAGE the customer wrote in (Arabic → reply in Arabic, English → English).
+- Stay factual; if you don't know something, say you'll have the team follow up.
+- Include a concrete next step or question that moves the conversation forward.
+- Never invent prices, availability or commitments.
+- No hashtags, no emojis walls (max 1 emoji), no signatures.`;
+
+  const transcript = opts.history
+    .slice(-10)
+    .map((m) => `${m.direction === "in" ? "Customer" : "Us"}: ${m.body}`)
+    .join("\n");
+  const user = `${transcript ? `Conversation so far:\n${transcript}\n\n` : ""}New message from the customer:\n${opts.incoming}\n\nWrite the reply message only.`;
+  const reply = await provider.generate(
+    [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    { maxTokens: 400, temperature: 0.6 }
+  );
+  return reply.trim();
+}
+
 // Deterministic analyst report (no AI key needed).
 export async function buildAnalystReport(companyId: string) {
   const [byStatus, byPlatform, scheduled, reels, plans, logs] = await Promise.all([
