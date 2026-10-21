@@ -310,7 +310,7 @@ export function PlanViewer({ planId }: { planId: string }) {
                 </ul>
               ) : null}
             </Card>
-          ) : null}
+          )}
         </div>
       </div>
     </div>

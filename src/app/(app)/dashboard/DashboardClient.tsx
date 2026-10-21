@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Building2, PenLine, Video, ClipboardList, CalendarClock, Plug, Sparkles, ArrowRight, Bot } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Misc";
+import { NetworkGraph, GraphNodeInput } from "@/components/ui/NetworkGraph";
 import { PlatformChip, StatusBadge } from "@/components/ui/Badge";
+import { AGENTS } from "@/lib/agents/registry";
+import { PLATFORMS } from "@/lib/constants";
 import { api } from "@/lib/client";
 import { formatDate, timeAgo } from "@/lib/utils";
 
@@ -54,6 +57,38 @@ export function DashboardClient() {
       .catch(() => setHealth({ media: false, aiTextConfigured: false, aiImageConfigured: false }));
   }, []);
 
+  // Nodes for the interactive 3D content universe
+  const graphNodes = useMemo<GraphNodeInput[]>(() => {
+    const platformHref: Record<string, string> = {
+      meta_instagram: "/posts",
+      meta_facebook: "/posts",
+      linkedin: "/posts",
+      x: "/posts",
+      tiktok: "/reels",
+      snapchat: "/posts",
+    };
+    const platformLabel: Record<string, string> = { meta_facebook: "Facebook" };
+    const counts = new Map((data?.postsByPlatform || []).map((p) => [p.platform, p.count]));
+    const platforms: GraphNodeInput[] = PLATFORMS.map((p) => ({
+      id: p.id,
+      label: platformLabel[p.id] || p.label,
+      sub: `${counts.get(p.id) || 0} posts`,
+      color: p.color,
+      href: platformHref[p.id] || "/posts",
+      kind: "platform",
+    }));
+    platforms.push({ id: "whatsapp", label: "WhatsApp", sub: "Inbox", color: "#25d366", href: "/whatsapp", kind: "platform" });
+    const agents: GraphNodeInput[] = AGENTS.map((a) => ({
+      id: a.key,
+      label: a.name,
+      sub: a.title.replace(" Agent", ""),
+      color: a.color,
+      href: "/agents",
+      kind: "agent",
+    }));
+    return [{ id: "hub", label: "Studio", color: "#d4a94f", kind: "hub" }, ...platforms, ...agents];
+  }, [data]);
+
   if (!data) return <Spinner label="Loading dashboard…" />;
 
   const statusCount = (s: string) => data.postsByStatus.find((x) => x.status === s)?.count || 0;
@@ -72,6 +107,93 @@ export function DashboardClient() {
         <h1 className="text-xl font-bold text-slate-900">Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">Everything across your companies: content, plans, reels and publishing.</p>
       </div>
+
+      {/* Hero: interactive 3D content universe + AI team */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-6 grid grid-cols-1 gap-5 lg:grid-cols-3"
+      >
+        <Card className="relative overflow-hidden lg:col-span-2">
+          <div className="pointer-events-none absolute left-5 top-4 z-10">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2dd4bf] opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2dd4bf]" />
+              </span>
+              <h3 className="text-sm font-bold tracking-tight text-slate-900">Content universe</h3>
+              <span className="micro-label !text-[9px]">live</span>
+            </div>
+            <p className="mt-0.5 text-xs text-slate-500">Your platforms and AI agents, orbiting the studio.</p>
+          </div>
+          <div className="pointer-events-none absolute right-5 top-4 z-10 flex items-center gap-1.5 text-[11px] text-slate-500">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M8 12h8M12 8v8"/></svg>
+            Drag to rotate · click a node
+          </div>
+          <div className="h-[380px] w-full">
+            <NetworkGraph nodes={graphNodes} />
+          </div>
+          <div className="pointer-events-none absolute bottom-4 left-5 z-10 flex items-center gap-4 text-[11px] text-slate-500">
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#e8c877] shadow-[0_0_8px_#e8c877]" />Platforms</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#2dd4bf] shadow-[0_0_8px_#2dd4bf]" />AI agents</span>
+          </div>
+        </Card>
+
+        <div className="flex flex-col gap-5">
+          {/* AI team banner */}
+          <Link href="/agents">
+            <Card className="group relative flex-1 overflow-hidden p-5 transition-all hover:shadow-[0_0_0_1px_var(--accent-ring),0_10px_36px_-14px_var(--accent)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-soft)] via-transparent to-transparent" />
+              <div className="relative flex flex-wrap items-center gap-4">
+                <motion.div
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)] text-2xl text-[#171207]"
+                  animate={{ rotate: [0, 6, -6, 0] }}
+                  transition={{ repeat: Infinity, duration: 4, repeatDelay: 1 }}
+                >
+                  <Bot size={24} />
+                </motion.div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-bold text-slate-900">Your AI marketing team is ready</h3>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    8 agents run your content on Autopilot — plan, write, design, film, schedule, publish, analyze, reply.
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--gold-bright)] transition-all group-hover:gap-2">
+                  Meet the agents <ArrowRight size={13} />
+                </span>
+              </div>
+            </Card>
+          </Link>
+
+          {/* Setup checklist */}
+          <Card className="flex-1">
+            <CardHeader title="Setup checklist" />
+            <div className="space-y-3 p-5">
+              {allDone ? (
+                <div className="rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">
+                  All set! Generate a <Link href="/plans" className="font-bold underline">marketing plan</Link> or jump straight to <Link href="/posts/new" className="font-bold underline">creating a post</Link>.
+                </div>
+              ) : (
+                checklist.map((c) => (
+                  <Link key={c.label} href={c.href} className="flex items-center gap-3 rounded-lg border border-slate-200 p-2.5 text-xs hover:border-[var(--accent)]">
+                    <span
+                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
+                        c.done
+                          ? "bg-emerald-100 text-emerald-600"
+                          : "border border-white/15 bg-transparent text-slate-500"
+                      }`}
+                    >
+                      {c.done ? "✓" : ""}
+                    </span>
+                    <span className={c.done ? "text-slate-400 line-through" : "text-slate-700"}>{c.label}</span>
+                  </Link>
+                ))
+              )}
+            </div>
+          </Card>
+        </div>
+      </motion.div>
 
       {/* Stat cards */}
       <motion.div
@@ -116,38 +238,6 @@ export function DashboardClient() {
         })}
       </motion.div>
 
-      {/* AI team banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        className="mb-6"
-      >
-        <Link href="/agents">
-          <Card className="group relative overflow-hidden p-5 transition-shadow hover:shadow-md">
-            <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-soft)] via-transparent to-transparent" />
-            <div className="relative flex flex-wrap items-center gap-4">
-              <motion.div
-                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)] text-2xl text-[#171207]"
-                animate={{ rotate: [0, 6, -6, 0] }}
-                transition={{ repeat: Infinity, duration: 4, repeatDelay: 1 }}
-              >
-                <Bot size={24} />
-              </motion.div>
-              <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-bold text-slate-900">Your AI marketing team is ready</h3>
-                <p className="mt-0.5 text-xs text-slate-500">
-                  7 agents — strategist, copywriter, designer, director, scheduler, publisher, analyst — run your content on Autopilot.
-                </p>
-              </div>
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent)] group-hover:gap-2 transition-all">
-                Meet the agents <ArrowRight size={13} />
-              </span>
-            </div>
-          </Card>
-        </Link>
-      </motion.div>
-
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {/* Upcoming */}
         <Card className="lg:col-span-2">
@@ -171,33 +261,6 @@ export function DashboardClient() {
                 </span>
               </div>
             ))}
-          </div>
-        </Card>
-
-        {/* Setup checklist */}
-        <Card>
-          <CardHeader title="Setup checklist" />
-          <div className="space-y-3 p-5">
-            {allDone ? (
-              <div className="rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">
-                All set! Generate a <Link href="/plans" className="font-bold underline">marketing plan</Link> or jump straight to <Link href="/posts/new" className="font-bold underline">creating a post</Link>.
-              </div>
-            ) : (
-              checklist.map((c) => (
-                <Link key={c.label} href={c.href} className="flex items-center gap-3 rounded-lg border border-slate-200 p-2.5 text-xs hover:border-[var(--accent)]">
-                  <span
-                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                      c.done
-                        ? "bg-emerald-100 text-emerald-600"
-                        : "border border-white/15 bg-transparent text-slate-500"
-                    }`}
-                  >
-                    {c.done ? "✓" : ""}
-                  </span>
-                  <span className={c.done ? "text-slate-400 line-through" : "text-slate-700"}>{c.label}</span>
-                </Link>
-              ))
-            )}
           </div>
         </Card>
 
