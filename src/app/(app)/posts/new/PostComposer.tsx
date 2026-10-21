@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Sparkles, ImageIcon, Upload, Rocket, CalendarClock, Save, X, Wand2, LayoutTemplate } from "lucide-react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Field, Input, Select, Textarea } from "@/components/ui/Form";
@@ -237,7 +238,12 @@ function ComposerInner() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
+        className="grid grid-cols-1 gap-5 lg:grid-cols-3"
+      >
         {/* Left: content + media */}
         <div className="space-y-5 lg:col-span-2">
           <Card>
@@ -497,7 +503,7 @@ function ComposerInner() {
             </div>
           </Card>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

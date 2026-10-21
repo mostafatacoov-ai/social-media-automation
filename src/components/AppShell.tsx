@@ -95,18 +95,22 @@ export function AppShell({
   return (
     <div className="flex min-h-screen" style={{ ["--accent" as string]: branding.accent }}>
       {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-slate-950 text-slate-300">
+      <aside className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col border-r border-white/5 bg-slate-950 text-slate-300">
         <div className="flex h-16 items-center gap-2.5 border-b border-white/10 px-5">
           {branding.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={branding.logoUrl} alt="" className="h-8 w-8 rounded-lg object-contain" />
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)] text-sm font-black text-white">
+            <motion.div
+              whileHover={{ rotate: -6, scale: 1.06 }}
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-sm font-black text-white shadow-lg"
+              style={{ boxShadow: "0 4px 14px -4px var(--accent)" }}
+            >
               {branding.appName.charAt(0)}
-            </div>
+            </motion.div>
           )}
           <div className="min-w-0">
-            <div className="truncate text-sm font-bold text-white">{branding.appName}</div>
+            <div className="truncate text-sm font-bold tracking-tight text-white">{branding.appName}</div>
           </div>
         </div>
 
@@ -201,9 +205,16 @@ export function AppShell({
               <div className="text-xs font-semibold text-slate-700">{user.name}</div>
               <div className="text-[11px] text-slate-400">{user.email}</div>
             </div>
+            <motion.div
+              whileHover={{ scale: 1.08 }}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-xs font-bold text-white shadow-sm"
+              title={user.name}
+            >
+              {user.name.charAt(0).toUpperCase()}
+            </motion.div>
             <button
               onClick={logout}
-              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
               title="Log out"
             >
               <LogOut size={14} />

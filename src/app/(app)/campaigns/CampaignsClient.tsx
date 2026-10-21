@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Field, Input, Select, Textarea } from "@/components/ui/Form";
 import { Modal } from "@/components/ui/Modal";
-import { PageHeader, Spinner, EmptyState } from "@/components/ui/Misc";
+import { PageHeader, Spinner, EmptyState, Stagger, StaggerItem } from "@/components/ui/Misc";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toaster";
 import { api } from "@/lib/client";
@@ -121,9 +121,10 @@ export function CampaignsClient() {
           action={<Button onClick={openCreate}><Plus size={15} /> Create campaign</Button>}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Stagger className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {campaigns.map((c) => (
-            <Card key={c.id} className="p-5">
+            <StaggerItem key={c.id} className="h-full">
+            <Card className="h-full p-5 transition-shadow hover:shadow-md">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <div>
                   <div className="text-sm font-bold text-slate-900">{c.name}</div>
@@ -153,8 +154,9 @@ export function CampaignsClient() {
                 <Badge color="green">{c._count?.reels ?? 0} reels</Badge>
               </div>
             </Card>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={editing ? `Edit ${editing.name}` : "New campaign"} wide>

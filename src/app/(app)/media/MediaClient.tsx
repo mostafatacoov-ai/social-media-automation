@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Image as ImageIcon, Trash2, Upload, Download } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { PageHeader, Spinner, Tabs, EmptyState } from "@/components/ui/Misc";
+import { PageHeader, Spinner, Tabs, EmptyState, Stagger, StaggerItem } from "@/components/ui/Misc";
 import { Badge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toaster";
 import { api } from "@/lib/client";
@@ -103,9 +103,10 @@ export function MediaClient() {
             active={tab}
             onChange={setTab}
           />
-          <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+          <Stagger className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
             {filtered.map((a) => (
-              <Card key={a.id} className="overflow-hidden">
+              <StaggerItem key={a.id}>
+              <Card className="overflow-hidden transition-shadow hover:shadow-md">
                 <div className="relative aspect-square bg-slate-100">
                   {a.mimeType.startsWith("video/") ? (
                     <video src={`/api/media/${a.filePath}`} className="h-full w-full object-cover" preload="metadata" />
@@ -141,8 +142,9 @@ export function MediaClient() {
                   </div>
                 </div>
               </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </>
       )}
     </div>

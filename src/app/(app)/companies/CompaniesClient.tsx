@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Field, Input, Select, Textarea } from "@/components/ui/Form";
 import { Modal } from "@/components/ui/Modal";
-import { PageHeader, Spinner, EmptyState } from "@/components/ui/Misc";
+import { PageHeader, Spinner, EmptyState, Stagger, StaggerItem } from "@/components/ui/Misc";
 import { Badge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toaster";
 import { api } from "@/lib/client";
@@ -117,9 +117,10 @@ export function CompaniesClient() {
           action={<Button onClick={openCreate}><Plus size={15} /> Create company</Button>}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Stagger className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {companies.map((c) => (
-            <Card key={c.id} className="p-5">
+            <StaggerItem key={c.id} className="h-full">
+            <Card className="h-full p-5 transition-shadow hover:shadow-md">
               <div className="mb-3 flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div
@@ -152,8 +153,9 @@ export function CompaniesClient() {
                 <Badge color="slate">{c._count?.reels ?? 0} reels</Badge>
               </div>
             </Card>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       )}
 
       <Modal

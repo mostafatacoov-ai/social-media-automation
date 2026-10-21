@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Field, Input, Select, Textarea } from "@/components/ui/Form";
 import { Modal } from "@/components/ui/Modal";
-import { PageHeader, Spinner, EmptyState } from "@/components/ui/Misc";
+import { PageHeader, Spinner, EmptyState, Stagger, StaggerItem } from "@/components/ui/Misc";
 import { Badge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toaster";
 import { api } from "@/lib/client";
@@ -118,9 +118,10 @@ export function PlansClient() {
           action={<Button onClick={() => setOpen(true)}><Plus size={15} /> Generate your first plan</Button>}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Stagger className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {plans.map((p) => (
-            <Card key={p.id} className="p-5">
+            <StaggerItem key={p.id} className="h-full">
+            <Card className="h-full p-5 transition-shadow hover:shadow-md">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <div>
                   <div className="text-sm font-bold text-slate-900">{p.title}</div>
@@ -143,8 +144,9 @@ export function PlansClient() {
                 Open plan <ChevronRight size={13} />
               </Link>
             </Card>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title="Generate marketing plan" wide>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarPlus, Printer } from "lucide-react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Spinner, ProgressBar } from "@/components/ui/Misc";
@@ -202,7 +203,13 @@ export function PlanViewer({ planId }: { planId: string }) {
             />
             <div className="space-y-5 p-5">
               {data.weeklyCalendar.map((w) => (
-                <div key={w.week}>
+                <motion.div
+                  key={w.week}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                >
                   <div className="mb-2 flex items-center justify-between">
                     <div className="text-sm font-bold text-slate-800">
                       Week {w.week}
@@ -239,7 +246,7 @@ export function PlanViewer({ planId }: { planId: string }) {
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </Card>

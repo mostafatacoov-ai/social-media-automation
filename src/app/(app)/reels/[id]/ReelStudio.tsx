@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Clapperboard, ImagePlus, Music, Play, Save, Send } from "lucide-react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Field, Input, Select, Textarea } from "@/components/ui/Form";
@@ -231,9 +232,21 @@ export function ReelStudio({ reelId }: { reelId: string }) {
                 ) : undefined
               }
             />
-            <div className="space-y-4 p-5">
+            <motion.div
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+              className="space-y-4 p-5"
+            >
               {script.scenes.map((s, i) => (
-                <div key={i} className="flex gap-4 rounded-xl border border-slate-200 p-4">
+                <motion.div
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 16 },
+                    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 24 } },
+                  }}
+                  className="flex gap-4 rounded-xl border border-slate-200 p-4 transition-shadow hover:shadow-md"
+                >
                   <div className="w-24 shrink-0">
                     {s.imagePath ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -277,13 +290,13 @@ export function ReelStudio({ reelId }: { reelId: string }) {
                       </Select>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
               <div className="rounded-xl bg-slate-50 p-4">
                 <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">Final CTA</div>
                 <Input value={script.cta || ""} onChange={(e) => setScript({ ...script, cta: e.target.value })} dir="auto" />
               </div>
-            </div>
+            </motion.div>
           </Card>
         </div>
 

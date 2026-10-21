@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
 import { Rocket } from "lucide-react";
 import { BrandingSettings } from "@/lib/settings";
+import { AuthShell } from "@/components/ui/AuthShell";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Form";
 import { api } from "@/lib/client";
@@ -37,22 +39,19 @@ export function SetupForm({ branding }: { branding: BrandingSettings }) {
   }
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center p-4"
-      style={{ background: `linear-gradient(135deg, #0f172a 0%, ${branding.accent}22 100%), #0f172a` }}
-    >
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+    <AuthShell>
+      <div className="rounded-2xl border border-white/10 bg-white/95 p-8 shadow-2xl backdrop-blur">
         <div className="mb-6 text-center">
-          <div
-            className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-white"
-            style={{ background: branding.accent }}
+          <motion.div
+            animate={{ y: [0, -6, 0] }}
+            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+            className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-lg"
+            style={{ boxShadow: "0 8px 24px -8px var(--accent)" }}
           >
             <Rocket size={22} />
-          </div>
-          <h1 className="text-lg font-bold text-slate-900">Welcome to {branding.appName}</h1>
-          <p className="mt-1 text-xs text-slate-500">
-            First run — create your admin account to get started.
-          </p>
+          </motion.div>
+          <h1 className="text-lg font-bold tracking-tight text-slate-900">Welcome to {branding.appName}</h1>
+          <p className="mt-1 text-xs text-slate-500">First run — create your admin account to get started.</p>
         </div>
         <form onSubmit={submit} className="space-y-4">
           <Field label="Your name" required>
@@ -67,12 +66,20 @@ export function SetupForm({ branding }: { branding: BrandingSettings }) {
           <Field label="Confirm password" required>
             <Input type="password" value={form.confirm} onChange={(e) => set("confirm", e.target.value)} required />
           </Field>
-          {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600">{error}</p>}
+          {error && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600"
+            >
+              {error}
+            </motion.p>
+          )}
           <Button type="submit" loading={loading} className="w-full" size="lg">
             Create admin account
           </Button>
         </form>
       </div>
-    </div>
+    </AuthShell>
   );
 }

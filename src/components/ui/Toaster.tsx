@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CheckCircle2, XCircle, Info, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export type ToastType = "success" | "error" | "info";
@@ -35,29 +36,35 @@ export function Toaster() {
 
   return (
     <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm">
-      {items.map((t) => (
-        <div
-          key={t.id}
-          className={cn(
-            "flex items-start gap-2 rounded-lg px-4 py-3 shadow-lg text-sm text-white animate-[slideIn_.2s_ease-out]",
-            t.type === "success" && "bg-emerald-600",
-            t.type === "error" && "bg-rose-600",
-            t.type === "info" && "bg-slate-800"
-          )}
-        >
-          {t.type === "success" && <CheckCircle2 size={16} className="mt-0.5 shrink-0" />}
-          {t.type === "error" && <XCircle size={16} className="mt-0.5 shrink-0" />}
-          {t.type === "info" && <Info size={16} className="mt-0.5 shrink-0" />}
-          <span className="flex-1">{t.message}</span>
-          <button
-            onClick={() => setItems((prev) => prev.filter((i) => i.id !== t.id))}
-            className="opacity-70 hover:opacity-100"
+      <AnimatePresence>
+        {items.map((t) => (
+          <motion.div
+            key={t.id}
+            layout
+            initial={{ opacity: 0, x: 60, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 40, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className={cn(
+              "flex items-start gap-2 rounded-xl px-4 py-3 text-sm text-white shadow-lg backdrop-blur",
+              t.type === "success" && "bg-emerald-600/95",
+              t.type === "error" && "bg-rose-600/95",
+              t.type === "info" && "bg-slate-800/95"
+            )}
           >
-            <X size={14} />
-          </button>
-        </div>
-      ))}
-      <style>{`@keyframes slideIn { from { transform: translateY(8px); opacity: 0 } to { transform: none; opacity: 1 } }`}</style>
+            {t.type === "success" && <CheckCircle2 size={16} className="mt-0.5 shrink-0" />}
+            {t.type === "error" && <XCircle size={16} className="mt-0.5 shrink-0" />}
+            {t.type === "info" && <Info size={16} className="mt-0.5 shrink-0" />}
+            <span className="flex-1">{t.message}</span>
+            <button
+              onClick={() => setItems((prev) => prev.filter((i) => i.id !== t.id))}
+              className="opacity-70 transition-opacity hover:opacity-100"
+            >
+              <X size={14} />
+            </button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

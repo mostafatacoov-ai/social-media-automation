@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Misc";
@@ -81,7 +82,13 @@ export function CalendarClient() {
       {!posts ? (
         <Spinner label="Loading calendar…" />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <motion.div
+          key={monthLabel}
+          initial={{ opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+        >
           <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
             {DAY_NAMES.map((d) => (
               <div key={d} className="px-3 py-2 text-center text-[11px] font-bold uppercase tracking-wide text-slate-500">
@@ -125,7 +132,7 @@ export function CalendarClient() {
               );
             })}
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

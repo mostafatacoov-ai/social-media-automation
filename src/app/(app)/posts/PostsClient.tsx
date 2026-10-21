@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PenLine, Plus, Rocket, Trash2, Pencil, Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { PageHeader, Spinner, EmptyState, Tabs } from "@/components/ui/Misc";
+import { PageHeader, Spinner, EmptyState, Tabs, Stagger, StaggerItem } from "@/components/ui/Misc";
 import { PlatformChip, StatusBadge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toaster";
 import { api } from "@/lib/client";
@@ -118,9 +118,10 @@ export function PostsClient() {
             }
           />
         ) : (
-          <div className="space-y-3">
+          <Stagger className="space-y-3">
             {posts.map((p) => (
-              <Card key={p.id} className="flex items-center gap-4 p-4">
+              <StaggerItem key={p.id}>
+              <Card className="flex items-center gap-4 p-4 transition-shadow hover:shadow-md">
                 <PlatformChip platform={p.platform} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm text-slate-800">{p.caption || "(no caption)"}</p>
@@ -193,8 +194,9 @@ export function PostsClient() {
                   </button>
                 </div>
               </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         )}
       </div>
     </div>
